@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-myservice
+  labels:
+    app: myservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myservice
+  template:
+    metadata:
+      labels:
+        app: myservice
+    spec:
+      containers:
+      - name: myservice
+        image: john19/myservice
+        ports:
+        - containerPort: 9090
+      imagePullSecrets: # change your secret file if needed
+        - name: some-secret

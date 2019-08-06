@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-myservice
+  labels:
+    svc: myservice
+spec:
+  type: NodePort
+  ports:
+    - name: "http"
+      port: 9090
+      targetPort: 9090
+      nodePort: 30909
+  selector:
+    app: myservice

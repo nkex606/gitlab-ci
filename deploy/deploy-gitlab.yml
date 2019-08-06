@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-gitlab
+  labels: 
+    deploy: gitlab
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      test: gitlab
+  template:
+    metadata:
+      labels:
+        test: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ee
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 512m
+            memory: 512Mi
+          limits:
+            cpu: 2048m
+            memory: 4096Mi
+        volumeMounts:
+        - name: gitlab-config
+          mountPath: /etc/gitlab
+        - name: gitlab-logs
+          mountPath: /var/log/gitlab
+        - name: gitlab-data
+          mountPath: /var/opt/gitlab
+      volumes:
+        - name: gitlab-config
+          hostPath: 
+            path: /srv/gitlab/config
+        - name: gitlab-logs
+          hostPath: 
+            path: /srv/gitlab/logs
+        - name: gitlab-data
+          hostPath:
+            path: /srv/gitlab/data    
+      restartPolicy: Always

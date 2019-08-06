@@ -8,8 +8,8 @@ data:
 
     [[runners]]
       name = "Kubernetes Runner"
-      url = "http://192.168.4.71:30080/"
-      token = "P-kqby1VbzjyUDfkUZwj"
+      url = "<gitlab_host>"
+      token = "<response_token_from_step1>"
       executor = "kubernetes"
       clone_url = "http://svc-gitlab"
       [runners.kubernetes]

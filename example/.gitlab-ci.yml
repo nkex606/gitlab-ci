@@ -2,16 +2,19 @@ variables:
   GIT_STRATEGY: clone
   DOCKER_HOST: tcp://localhost:2375
   DOCKER_DRIVER: overlay2
-  SERVICE_NAME: "myservice"
-  DOCKER_REGISTRY_HOST: "<your-docker-registry>"
+  SERVICE_NAME: "cidemo"
+  # DOCKER_REGISTRY_HOST: "cy.docker.dev"
+  # DOCKER_USER = "cypress"
+  DOCKER_REGISTRY_HOST = "docker.io"
+  DOCKER_USER = "john19"
 
 image: docker:stable
 services:
-  - name: docker:dind
-    command: ["--insecure-registry=<your-docker-registry>"]
+  - name: docker:18.09-dind
+    command: ["--insecure-registry=cy.docker.dev"]
     
 before_script:
-  - echo "192.168.4.139 <your-docker-registry>" >> /etc/hosts
+  # - echo "192.168.4.139 cy.docker.dev" >> /etc/hosts
   - apk add git && cd $CI_PROJECT_DIR && export TAG=$(git describe --tags --abbrev=0)
   - echo $CI_PROJECT_DIR && echo $TAG && echo $CI_COMMIT_REF_NAME && echo $CI_COMMIT_SHORT_SHA
 
@@ -24,9 +27,9 @@ stages:
 build_image:
   stage: build
   script:
-    - docker build -t $DOCKER_REGISTRY_HOST/$SERVICE_NAME:$TAG\_$CI_COMMIT_REF_NAME\_$CI_COMMIT_SHORT_SHA .
-    - docker login -u $HARBOR_USER -p $HARBOR_PWD $DOCKER_REGISTRY_HOST
-    - docker push $DOCKER_REGISTRY_HOST/$SERVICE_NAME:$TAG\_$CI_COMMIT_REF_NAME\_$CI_COMMIT_SHORT_SHA
+    - docker build -t $DOCKER_REGISTRY_HOST/$DOCKER_USER/$SERVICE_NAME:$TAG\_$CI_COMMIT_REF_NAME\_$CI_COMMIT_SHORT_SHA .
+    - docker login -u $DOCKER_USER -p $DOCKER_PWD $DOCKER_REGISTRY_HOST
+    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_USER/$SERVICE_NAME:$TAG\_$CI_COMMIT_REF_NAME\_$CI_COMMIT_SHORT_SHA
   only:
     - /^f[0-9]{5}$/
 
@@ -34,9 +37,9 @@ build_image:
 master_build_image:
   stage: build
   script:
-    - docker build -t $DOCKER_REGISTRY_HOST/$SERVICE_NAME:$CI_COMMIT_REF_NAME .
-    - docker login -u $HARBOR_USER -p $HARBOR_PWD $DOCKER_REGISTRY_HOST
-    - docker push $DOCKER_REGISTRY_HOST/$SERVICE_NAME:$CI_COMMIT_REF_NAME
+    - docker build -t $DOCKER_REGISTRY_HOST/$DOCKER_USER/$SERVICE_NAME:$CI_COMMIT_REF_NAME .
+    - docker login -u $DOCKER_USER -p $DOCKER_PWD $DOCKER_REGISTRY_HOST
+    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_USER/$SERVICE_NAME:$CI_COMMIT_REF_NAME
   only:
     - tags
 
@@ -53,7 +56,7 @@ notify:
   stage: deploy
   script:
     - apk add curl
-    - curl -X POST http://192.168.4.141:8080/job/Webhook/build?token=asdfqwer --user xxx:ooo --data-urlencode json="{\"parameter\":[{\"name\":\"tag\", \"value\":\"$TAG\_$CI_COMMIT_REF_NAME\_$CI_COMMIT_SHORT_SHA\"}]}"
+    - curl -X POST http://<jenkins_url> --user <jenkins_user>:<jenkins_usertoken> --data-urlencode json="{\"parameter\":[{\"name\":\"tag\", \"value\":\"$TAG\_$CI_COMMIT_REF_NAME\_$CI_COMMIT_SHORT_SHA\"}]}"
   only:
     - /^f[0-9]{5}$/
 
@@ -62,7 +65,7 @@ master_notify:
   stage: deploy
   script:
     - apk add curl
-    - curl -X POST http://192.168.4.141:8080/job/Webhook/build?token=asdfqwer --user xxx:ooo --data-urlencode json="{\"parameter\":[{\"name\":\"tag\", \"value\":\"$CI_COMMIT_REF_NAME\"}]}"
+    - curl -X POST http://<jenkins_url> --user <jenkins_user>:<jenkins_usertoken> --data-urlencode json="{\"parameter\":[{\"name\":\"tag\", \"value\":\"$CI_COMMIT_REF_NAME\"}]}"
   environment: dev
   only:
     - tags

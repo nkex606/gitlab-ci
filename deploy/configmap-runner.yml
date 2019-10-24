@@ -1,19 +1,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitlab-runner
+  namespace: john
+  name: cfg-gitlab-runner
 data:
   config.toml: |
     concurrent = 4
 
     [[runners]]
       name = "Kubernetes Runner"
-      url = "<gitlab_host>"
-      token = "<response_token_from_step1>"
+      url = "http://<gitlab_url>/"
+      token = "xxxxx""
       executor = "kubernetes"
       clone_url = "http://svc-gitlab"
       [runners.kubernetes]
-        namespace = "default"
+        namespace = "john"
         image = "alpine:latest"
         privileged = true
         disable_cache = true

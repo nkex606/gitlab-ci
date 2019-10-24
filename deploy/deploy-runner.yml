@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: john
   name: gitlab-runner
 spec:
   replicas: 1
@@ -12,6 +13,7 @@ spec:
       labels:
         name: gitlab-runner
     spec:
+      serviceAccount: sa-gitlab-runner
       containers:
       - args:
         - run
@@ -26,7 +28,7 @@ spec:
       restartPolicy: Always
       volumes:
       - configMap:
-          name: gitlab-runner
+          name: cfg-gitlab-runner
         name: config
       - hostPath:
           path: /usr/share/ca-certificates/mozilla

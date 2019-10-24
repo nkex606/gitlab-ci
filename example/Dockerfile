@@ -1,6 +1,5 @@
 FROM golang
 WORKDIR /go/src/gitlab-ci
-COPY ./ /go/src/gitlab-ci
-RUN cd /go/src/gitlab-ci && \
-    GOOS=linux GOARCH=amd64 go build -o myservice
-ENTRYPOINT ["/go/src/gitlab-ci/myservice"]
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cidemo .
+ENTRYPOINT ["/go/src/gitlab-ci/cidemo"]

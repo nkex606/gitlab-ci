@@ -1,0 +1,31 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: john
+  name: role-gitlab-runner
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rolebinding-gitlab-runner
+  namespace: john
+subjects:
+- kind: ServiceAccount
+  name: sa-gitlab-runner
+  namespace: john
+roleRef:
+  kind: Role
+  name: role-gitlab-runner
+  apiGroup: rbac.authorization.k8s.io
+
+--- 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-gitlab-runner
+  namespace: john

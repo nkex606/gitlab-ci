@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: john
+  name: deploy-cidemo
+  labels:
+    app: cidemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cidemo
+  template:
+    metadata:
+      labels:
+        app: cidemo
+    spec:
+      containers:
+      - name: cidemo
+        image: docker.io/john19/myservice:0.0.2
+        ports:
+        - containerPort: 9090
